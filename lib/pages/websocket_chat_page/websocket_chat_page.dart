@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -15,7 +14,6 @@ class WebsocketChatPage extends StatefulWidget {
 }
 
 class _WebsocketChatPageState extends State<WebsocketChatPage> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _controller = TextEditingController();
   WebSocketChannel? _channel;
   String? username;
@@ -32,17 +30,13 @@ class _WebsocketChatPageState extends State<WebsocketChatPage> {
     _connectToWebSocket();
   }
 
-
   Future<void> _connectToWebSocket() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String backendUrl = '192.168.1.107:8000';
 
-    final refreshTokenUrl = Uri.parse("${Constants.BACKEND_URL}/api/token/refresh/");
-    final refreshResponse = await http.post(
-        refreshTokenUrl,
-        body: {'refresh': prefs.getString('refresh')}
-    );
-
+    final refreshTokenUrl =
+        Uri.parse("${Constants.BACKEND_URL}/api/token/refresh/");
+    final refreshResponse = await http
+        .post(refreshTokenUrl, body: {'refresh': prefs.getString('refresh')});
 
     if (refreshResponse.statusCode == 200) {
       final data = json.decode(refreshResponse.body);
@@ -64,28 +58,31 @@ class _WebsocketChatPageState extends State<WebsocketChatPage> {
     }
 
     String accessToken = prefs.getString('access') ?? '';
-    String websocketUrl = 'ws://$backendUrl/ws/$room/?token=$accessToken';
+    String websocketUrl =
+        '${Constants.WS_BACKEND_URL}/ws/$room/?token=$accessToken';
     _channel = IOWebSocketChannel.connect(websocketUrl);
 
     List<String> newMessages = [
       // Добавьте свои сообщения здесь
     ];
 
-    final chatMessagesGetRequest = await http.get(Uri.parse("${Constants.BACKEND_URL}"
-        "/api/chatmessages/?room=$room"),
-        headers: {'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'application/json' }
-    );
+    final chatMessagesGetRequest = await http.get(
+        Uri.parse("${Constants.BACKEND_URL}"
+            "/api/chatmessages/?room=$room"),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json'
+        });
 
     if (chatMessagesGetRequest.statusCode == 200) {
       var dataChatMessages = json.decode(chatMessagesGetRequest.body);
-      final usersGetRequest = await http.get(Uri.parse("${Constants.BACKEND_URL}/api/users/"),
-          headers: {'Authorization': 'Bearer $accessToken',
-            'Content-Type': 'application/json' }
-      );
+      final usersGetRequest = await http
+          .get(Uri.parse("${Constants.BACKEND_URL}/api/users/"), headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json'
+      });
       if (usersGetRequest.statusCode == 200) {
-        final Map<int, String> mapForUsers = {
-        };
+        final Map<int, String> mapForUsers = {};
         // final Map<, int> mapForChatMessages = {
         // };
         var dataUsers = json.decode(usersGetRequest.body);
@@ -96,7 +93,8 @@ class _WebsocketChatPageState extends State<WebsocketChatPage> {
 
         for (int i = 0; i < dataChatMessages.length; i++) {
           // mapForChatMessages[dataChatMessages[i]['user']] = dataChatMessages[i]['content'];
-          newMessages.add("${mapForUsers[dataChatMessages[i]['user']]}: ${dataChatMessages[i]['content']}");
+          newMessages.add(
+              "${mapForUsers[dataChatMessages[i]['user']]}: ${dataChatMessages[i]['content']}");
         }
 
         setState(() {
@@ -105,20 +103,20 @@ class _WebsocketChatPageState extends State<WebsocketChatPage> {
         });
 
         _listenToWebSocket();
-
       }
     }
   }
 
   void _listenToWebSocket() {
     _channel?.stream.listen(
-          (message) {
+      (message) {
         // Обработка полученного сообщения
         // showMessage('Received: $message');
-            var receivedData = jsonDecode(message);
-            setState(() {
-              messages.add(receivedData['username'] + ": " + receivedData['message']);
-            });
+        var receivedData = jsonDecode(message);
+        setState(() {
+          messages
+              .add(receivedData['username'] + ": " + receivedData['message']);
+        });
       },
       onError: (error) {
         // Обработка ошибок при получении сообщений
@@ -139,7 +137,7 @@ class _WebsocketChatPageState extends State<WebsocketChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat'),
+        title: const Text('Chat'),
       ),
       body: Column(
         children: <Widget>[
@@ -162,8 +160,7 @@ class _WebsocketChatPageState extends State<WebsocketChatPage> {
               ),
             ),
           ),
-
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -171,13 +168,13 @@ class _WebsocketChatPageState extends State<WebsocketChatPage> {
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                    decoration: InputDecoration(labelText: 'Send a message'),
+                    decoration:
+                        const InputDecoration(labelText: 'Send a message'),
                   ),
                 ),
                 ElevatedButton(
                   onPressed: () {
                     if (_controller.text.isNotEmpty) {
-
                       Map<String, dynamic> json = {
                         'message': _controller.text,
                         'username': username,
@@ -192,7 +189,7 @@ class _WebsocketChatPageState extends State<WebsocketChatPage> {
                       _controller.clear();
                     }
                   },
-                  child: Text('Send'),
+                  child: const Text('Send'),
                 ),
               ],
             ),

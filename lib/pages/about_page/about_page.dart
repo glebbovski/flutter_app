@@ -1,11 +1,9 @@
 import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../assets/constants.dart' as Constants;
 import 'package:http/http.dart' as http;
-
 
 class AboutPage extends StatefulWidget {
   @override
@@ -13,7 +11,9 @@ class AboutPage extends StatefulWidget {
 }
 
 class _AboutPageState extends State<AboutPage> {
-  String creator = '';
+  TextEditingController _creatorController = TextEditingController();
+  TextEditingController _bornCityController = TextEditingController();
+  TextEditingController _aboutProjectController = TextEditingController();
 
   @override
   void initState() {
@@ -22,17 +22,14 @@ class _AboutPageState extends State<AboutPage> {
   }
 
   Future<void> _fetchData() async {
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? accessToken = prefs.getString('access');
 
     if (accessToken != null) {
-      final refreshTokenUrl = Uri.parse("${Constants.BACKEND_URL}/api/token/refresh/");
-      final refreshResponse = await http.post(
-        refreshTokenUrl,
-        body: {'refresh': prefs.getString('refresh')}
-      );
-
+      final refreshTokenUrl =
+          Uri.parse("${Constants.BACKEND_URL}/api/token/refresh/");
+      final refreshResponse = await http
+          .post(refreshTokenUrl, body: {'refresh': prefs.getString('refresh')});
 
       if (refreshResponse.statusCode == 200) {
         final data = json.decode(refreshResponse.body);
@@ -50,36 +47,40 @@ class _AboutPageState extends State<AboutPage> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        print(data);
         setState(() {
-          creator = data['creator'];
+          _creatorController.text = data['creator'];
+          _aboutProjectController.text = data['about_project'];
+          _bornCityController.text = data['born_city'];
         });
-      } else {
-        // Обработка ошибки
-      }
-    } else {
-      // Обработка случая, когда токен доступа отсутствует
-    }
-
+      } else {}
+    } else {}
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('About Page'),
+        title: Text('User Profile'),
       ),
-      body: Center(
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Creator:',
-              style: TextStyle(fontSize: 20),
+            TextFormField(
+              controller: _creatorController,
+              readOnly: true,
+              decoration: const InputDecoration(labelText: 'Creator'),
             ),
-            Text(
-              creator,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            TextFormField(
+              controller: _bornCityController,
+              readOnly: true,
+              decoration: const InputDecoration(labelText: 'Born City'),
+            ),
+            TextFormField(
+              controller: _aboutProjectController,
+              readOnly: true,
+              decoration: InputDecoration(labelText: 'About Project'),
             ),
           ],
         ),

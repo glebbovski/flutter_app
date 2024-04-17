@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../assets/constants.dart' as Constants;
 import '../home_page/home_page.dart';
+import '../register_page/register_page.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -92,6 +93,14 @@ class _LoginPageState extends State<LoginPage> {
             Text(
               errorMessage,
               style: const TextStyle(color: Colors.red),
+            ),
+            // const SizedBox(height: 8.0),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => RegistrationPage()));
+              },
+              child: const Text('Register'),
             ),
           ],
         ),
