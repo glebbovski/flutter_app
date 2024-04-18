@@ -20,9 +20,7 @@ class _WebsocketChatPageState extends State<WebsocketChatPage> {
   int? userId;
   String room = 'chatroom';
 
-  List<String> messages = [
-    // Добавьте свои сообщения здесь
-  ];
+  List<String> messages = [];
 
   @override
   void initState() {
@@ -53,18 +51,14 @@ class _WebsocketChatPageState extends State<WebsocketChatPage> {
       final data = json.decode(response.body);
       username = data['username'];
       userId = data['user_id'];
-    } else {
-      // Обработка ошибки
-    }
+    } else {}
 
     String accessToken = prefs.getString('access') ?? '';
     String websocketUrl =
         '${Constants.WS_BACKEND_URL}/ws/$room/?token=$accessToken';
     _channel = IOWebSocketChannel.connect(websocketUrl);
 
-    List<String> newMessages = [
-      // Добавьте свои сообщения здесь
-    ];
+    List<String> newMessages = [];
 
     final chatMessagesGetRequest = await http.get(
         Uri.parse("${Constants.BACKEND_URL}"
@@ -83,16 +77,12 @@ class _WebsocketChatPageState extends State<WebsocketChatPage> {
       });
       if (usersGetRequest.statusCode == 200) {
         final Map<int, String> mapForUsers = {};
-        // final Map<, int> mapForChatMessages = {
-        // };
         var dataUsers = json.decode(usersGetRequest.body);
         for (int i = 0; i < dataUsers.length; i++) {
           mapForUsers[dataUsers[i]['id']] = dataUsers[i]['username'];
-          // print(dataUsers[i]['username']);
         }
 
         for (int i = 0; i < dataChatMessages.length; i++) {
-          // mapForChatMessages[dataChatMessages[i]['user']] = dataChatMessages[i]['content'];
           newMessages.add(
               "${mapForUsers[dataChatMessages[i]['user']]}: ${dataChatMessages[i]['content']}");
         }
@@ -110,8 +100,6 @@ class _WebsocketChatPageState extends State<WebsocketChatPage> {
   void _listenToWebSocket() {
     _channel?.stream.listen(
       (message) {
-        // Обработка полученного сообщения
-        // showMessage('Received: $message');
         var receivedData = jsonDecode(message);
         setState(() {
           messages
@@ -119,11 +107,9 @@ class _WebsocketChatPageState extends State<WebsocketChatPage> {
         });
       },
       onError: (error) {
-        // Обработка ошибок при получении сообщений
         showMessage('Error: $error');
       },
       onDone: () {
-        // Обработка завершения WebSocket соединения
         showMessage('WebSocket connection closed');
       },
     );
@@ -145,7 +131,6 @@ class _WebsocketChatPageState extends State<WebsocketChatPage> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  // Список сообщений
                   ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
@@ -181,11 +166,7 @@ class _WebsocketChatPageState extends State<WebsocketChatPage> {
                         'user_id': userId,
                         'room': room
                       };
-
                       _channel?.sink.add(jsonEncode(json));
-                      // setState(() {
-                      //   messages.add('$username: ${_controller.text}');
-                      // });
                       _controller.clear();
                     }
                   },

@@ -52,7 +52,9 @@ class _AboutPageState extends State<AboutPage> {
           _aboutProjectController.text = data['about_project'];
           _bornCityController.text = data['born_city'];
         });
-      } else {}
+      } else {
+
+      }
     } else {}
   }
 
@@ -60,7 +62,7 @@ class _AboutPageState extends State<AboutPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('User Profile'),
+        title: Text('About Page'),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),

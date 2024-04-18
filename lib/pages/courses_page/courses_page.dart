@@ -90,16 +90,13 @@ class _CoursesPageState extends State<CoursesPage> {
             margin: const EdgeInsets.all(8.0),
             child: ListTile(
               onTap: () {
-                // Navigate to course details page
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => CourseDetailsPage(course: course),
-                    // builder: (context) => QuizPage(course: course),
                   ),
                 );
               },
-              // leading: Image.network(course.imageUrl),
               title: Text(
                 course.title,
                 style: const TextStyle(
